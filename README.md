@@ -115,12 +115,18 @@ Current repository expectations:
 
 ## Local Development
 
-Copy `.env.example` to `.env` before starting the stack.
+This repository uses `direnv` for local environment variables.
+
+Before starting the stack:
+
+```bash
+direnv allow
+```
 
 Start the local environment:
 
 ```bash
-docker compose -f deploy/docker/docker-compose.yml up --build
+direnv exec . docker compose -f deploy/docker/docker-compose.yml up --build
 ```
 
 From the repository root, you can also use:
@@ -137,6 +143,8 @@ make build
 make logs
 make ps
 ```
+
+The root `Makefile` runs Compose through `direnv`, so the values from `.envrc` are loaded automatically.
 
 Once the app is running:
 
@@ -156,3 +164,4 @@ Expected health response:
 
 - The old repository that informed this restart lives at `../kornet-kover`.
 - This repository should stay focused on a clean, maintainable rebuild rather than incremental carry-over of old architectural mistakes.
+- The default local environment values are stored in `.envrc`.

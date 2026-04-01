@@ -1,0 +1,10 @@
+export APP_ENV=development
+export APP_HOST=0.0.0.0
+export APP_PORT=8000
+
+export POSTGRES_DB=quant_cover
+export POSTGRES_USER=quant_cover
+export POSTGRES_PASSWORD=quant_cover
+export POSTGRES_PORT=5432
+
+export DATABASE_URL=postgresql://quant_cover:quant_cover@postgres:5432/quant_cover
