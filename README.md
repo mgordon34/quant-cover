@@ -209,6 +209,34 @@ curl -X POST "http://localhost:8000/strategies" \
 
 For now, strategies require an existing `users.id`. Auth is not implemented yet.
 
+Create a backtest run:
+
+```bash
+curl -X POST "http://localhost:8000/backtest-runs" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": 1,
+    "strategy_id": 1,
+    "dataset_version": "nba-2024-regular-season-v1",
+    "parameters": {
+      "start_date": "2024-10-22",
+      "end_date": "2025-04-13"
+    }
+  }'
+```
+
+List backtest runs for a user:
+
+```bash
+curl "http://localhost:8000/backtest-runs?user_id=1"
+```
+
+Fetch a backtest run:
+
+```bash
+curl "http://localhost:8000/backtest-runs/1"
+```
+
 ## Notes
 
 - The old repository that informed this restart lives at `../kornet-kover`.
