@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     postgres_user: str = "quant_cover"
     postgres_password: str = "quant_cover"
     postgres_port: int = 5432
-    database_url: str = "postgresql://quant_cover:quant_cover@postgres:5432/quant_cover"
+    database_url: str = "postgresql+psycopg://quant_cover:quant_cover@postgres:5432/quant_cover"
 
     model_config = SettingsConfigDict(case_sensitive=False)
 

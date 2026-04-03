@@ -171,6 +171,23 @@ make migrate
 
 The first API slice currently supports listing and creating strategies.
 
+Create a user:
+
+```bash
+curl -X POST "http://localhost:8000/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "matt@example.com",
+    "display_name": "Matt"
+  }'
+```
+
+Fetch a user:
+
+```bash
+curl "http://localhost:8000/users/1"
+```
+
 List strategies for a user:
 
 ```bash
@@ -190,7 +207,35 @@ curl -X POST "http://localhost:8000/strategies" \
   }'
 ```
 
-For now, strategies require an existing `users.id`. Auth and user-management endpoints are not implemented yet.
+For now, strategies require an existing `users.id`. Auth is not implemented yet.
+
+Create a backtest run:
+
+```bash
+curl -X POST "http://localhost:8000/backtest-runs" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": 1,
+    "strategy_id": 1,
+    "dataset_version": "nba-2024-regular-season-v1",
+    "parameters": {
+      "start_date": "2024-10-22",
+      "end_date": "2025-04-13"
+    }
+  }'
+```
+
+List backtest runs for a user:
+
+```bash
+curl "http://localhost:8000/backtest-runs?user_id=1"
+```
+
+Fetch a backtest run:
+
+```bash
+curl "http://localhost:8000/backtest-runs/1"
+```
 
 ## Notes
 

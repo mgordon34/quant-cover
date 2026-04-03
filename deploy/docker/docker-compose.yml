@@ -7,7 +7,7 @@ services:
       APP_ENV: ${APP_ENV:-development}
       APP_HOST: ${APP_HOST:-0.0.0.0}
       APP_PORT: ${APP_PORT:-8000}
-      DATABASE_URL: ${DATABASE_URL:-postgresql://quant_cover:quant_cover@postgres:5432/quant_cover}
+      DATABASE_URL: ${DATABASE_URL:-postgresql+psycopg://quant_cover:quant_cover@postgres:5432/quant_cover}
     volumes:
       - ../../apps/api:/app
     ports:
