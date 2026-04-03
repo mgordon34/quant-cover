@@ -171,6 +171,23 @@ make migrate
 
 The first API slice currently supports listing and creating strategies.
 
+Create a user:
+
+```bash
+curl -X POST "http://localhost:8000/users" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "matt@example.com",
+    "display_name": "Matt"
+  }'
+```
+
+Fetch a user:
+
+```bash
+curl "http://localhost:8000/users/1"
+```
+
 List strategies for a user:
 
 ```bash
@@ -190,7 +207,7 @@ curl -X POST "http://localhost:8000/strategies" \
   }'
 ```
 
-For now, strategies require an existing `users.id`. Auth and user-management endpoints are not implemented yet.
+For now, strategies require an existing `users.id`. Auth is not implemented yet.
 
 ## Notes
 
