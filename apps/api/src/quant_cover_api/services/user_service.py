@@ -1,5 +1,6 @@
 from fastapi import HTTPException
 from sqlalchemy import select
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from quant_cover_api.db.models.user import User
@@ -17,7 +18,11 @@ class UserService:
 
         user = User(email=normalized_email, display_name=display_name)
         self.session.add(user)
-        self.session.commit()
+        try:
+            self.session.commit()
+        except IntegrityError:
+            self.session.rollback()
+            raise HTTPException(status_code=409, detail="User already exists") from None
         self.session.refresh(user)
         return user
 

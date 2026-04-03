@@ -29,7 +29,7 @@ class StrategyService:
 
         strategy = Strategy(
             user_id=user_id,
-            name=name.strip(),
+            name=name,
             description=description,
             configuration=configuration,
         )
