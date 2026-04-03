@@ -200,8 +200,8 @@ Columns:
 - `game_date` `date` not null
 - `started_at` `timestamptz` nullable
 - `status` `varchar(32)` not null
-- `home_team_id` `bigint` not null references `teams(id)` on delete restrict
-- `away_team_id` `bigint` not null references `teams(id)` on delete restrict
+- `home_team_id` `bigint` not null references `teams(id)` on delete cascade
+- `away_team_id` `bigint` not null references `teams(id)` on delete cascade
 - `home_score` `integer` nullable
 - `away_score` `integer` nullable
 - `stathead_game_id` `varchar(64)` nullable
@@ -238,8 +238,8 @@ Columns:
 - `id` `bigint` primary key
 - `player_id` `bigint` not null references `players(id)` on delete cascade
 - `game_id` `bigint` not null references `games(id)` on delete cascade
-- `team_id` `bigint` not null references `teams(id)` on delete restrict
-- `opponent_team_id` `bigint` not null references `teams(id)` on delete restrict
+- `team_id` `bigint` not null references `teams(id)` on delete cascade
+- `opponent_team_id` `bigint` not null references `teams(id)` on delete cascade
 - `started` `boolean` nullable
 - `minutes` `numeric(5,2)` nullable
 - `points` `integer` nullable

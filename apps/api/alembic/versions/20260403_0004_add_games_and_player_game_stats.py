@@ -43,8 +43,8 @@ def upgrade() -> None:
             name="ck_games_status",
         ),
         sa.ForeignKeyConstraint(["league_id"], ["leagues.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["home_team_id"], ["teams.id"], ondelete="RESTRICT"),
-        sa.ForeignKeyConstraint(["away_team_id"], ["teams.id"], ondelete="RESTRICT"),
+        sa.ForeignKeyConstraint(["home_team_id"], ["teams.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["away_team_id"], ["teams.id"], ondelete="CASCADE"),
     )
     op.create_index("ix_games_league_id_game_date", "games", ["league_id", "game_date"], unique=False)
     op.create_index("ix_games_home_team_id", "games", ["home_team_id"], unique=False)
@@ -81,8 +81,8 @@ def upgrade() -> None:
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(["player_id"], ["players.id"], ondelete="CASCADE"),
         sa.ForeignKeyConstraint(["game_id"], ["games.id"], ondelete="CASCADE"),
-        sa.ForeignKeyConstraint(["team_id"], ["teams.id"], ondelete="RESTRICT"),
-        sa.ForeignKeyConstraint(["opponent_team_id"], ["teams.id"], ondelete="RESTRICT"),
+        sa.ForeignKeyConstraint(["team_id"], ["teams.id"], ondelete="CASCADE"),
+        sa.ForeignKeyConstraint(["opponent_team_id"], ["teams.id"], ondelete="CASCADE"),
     )
     op.create_index("ix_player_game_stats_game_id", "player_game_stats", ["game_id"], unique=False)
     op.create_index("ix_player_game_stats_team_id", "player_game_stats", ["team_id"], unique=False)
