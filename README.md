@@ -169,6 +169,8 @@ Apply the initial database migration after the containers are up:
 make migrate
 ```
 
+The schema migrations also seed the initial `sports` and `leagues` rows for `basketball` and `nba`.
+
 The first API slice currently supports listing and creating strategies.
 
 Create a user:
