@@ -1,7 +1,8 @@
 COMPOSE_FILE := deploy/docker/docker-compose.yml
 COMPOSE := direnv exec . docker compose -f $(COMPOSE_FILE)
+API_UV := uv run --project apps/api
 
-.PHONY: up down build logs ps restart migrate
+.PHONY: up down build logs ps restart migrate test test-unit test-integration lint format check pre-commit install-hooks sync-nba-teams sync-nba-teams-fixture sync-nba-com-teams sync-nba-com-teams-fixture
 
 up:
 	$(COMPOSE) up --build
@@ -24,3 +25,42 @@ restart:
 
 migrate:
 	$(COMPOSE) run --rm api alembic upgrade head
+
+test:
+	$(API_UV) pytest
+
+test-unit:
+	$(API_UV) pytest apps/api/tests/unit
+
+test-integration:
+	$(API_UV) pytest apps/api/tests/integration
+
+lint:
+	$(API_UV) ruff check apps/api
+
+format:
+	$(API_UV) ruff check --fix apps/api
+	$(API_UV) ruff format apps/api
+
+check:
+	$(API_UV) ruff check apps/api
+	$(API_UV) ruff format --check apps/api
+	$(API_UV) pytest
+
+pre-commit:
+	$(API_UV) pre-commit run --all-files
+
+install-hooks:
+	$(API_UV) pre-commit install
+
+sync-nba-teams:
+	$(COMPOSE) run --build --rm api python -m quant_cover_api.cli sync stathead teams --league nba
+
+sync-nba-teams-fixture:
+	$(COMPOSE) run --build --rm api python -m quant_cover_api.cli sync stathead teams --league nba --fixture /app/src/quant_cover_api/scraping/fixtures/stathead_nba_teams.html
+
+sync-nba-com-teams:
+	$(COMPOSE) run --build --rm api python -m quant_cover_api.cli sync nba-com teams --league nba
+
+sync-nba-com-teams-fixture:
+	$(COMPOSE) run --build --rm api python -m quant_cover_api.cli sync nba-com teams --league nba --fixture /app/src/quant_cover_api/scraping/fixtures/nba_com_nba_teams.json

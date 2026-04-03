@@ -6,12 +6,11 @@ Create Date: 2026-04-03 00:10:00
 
 """
 
-from typing import Sequence
-from typing import Union
+from typing import Sequence, Union
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 revision: str = "20260403_0002"
 down_revision: Union[str, None] = "20260403_0001"
@@ -51,7 +50,7 @@ def upgrade() -> None:
         sa.text(
             """
             INSERT INTO sports (key, name, stathead_domain, created_at, updated_at)
-            VALUES ('basketball', 'Basketball', 'stathead.com', NOW(), NOW())
+            VALUES ('basketball', 'Basketball', 'basketball-reference.com', NOW(), NOW())
             """
         )
     )
@@ -59,7 +58,7 @@ def upgrade() -> None:
         sa.text(
             """
             INSERT INTO leagues (sport_id, key, name, stathead_league_key, odds_api_sport_key, is_active, created_at, updated_at)
-            SELECT id, 'nba', 'NBA', 'basketball', NULL, true, NOW(), NOW()
+            SELECT id, 'nba', 'NBA', 'nba', NULL, true, NOW(), NOW()
             FROM sports
             WHERE key = 'basketball'
             """

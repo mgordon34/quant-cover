@@ -1,10 +1,8 @@
-from fastapi import APIRouter
-from fastapi import Depends
+from fastapi import APIRouter, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
 
 from quant_cover_api.api.dependencies import get_db
-
 
 router = APIRouter(tags=["health"])
 

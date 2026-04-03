@@ -1,16 +1,11 @@
 from __future__ import annotations
 
 from datetime import date
-from sqlalchemy import BigInteger
-from sqlalchemy import Date
 from typing import Any
 
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
+from sqlalchemy import BigInteger, Date, ForeignKey, String
 from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from quant_cover_api.db.base import Base
 from quant_cover_api.db.models.timestamps import TimestampMixin

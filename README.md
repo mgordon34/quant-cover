@@ -143,10 +143,31 @@ make down
 make build
 make logs
 make ps
+make test
+make test-unit
+make test-integration
+make lint
+make format
+make check
+make install-hooks
 make migrate
+make sync-nba-teams
+make sync-nba-teams-fixture
+make sync-nba-com-teams
+make sync-nba-com-teams-fixture
 ```
 
 The root `Makefile` runs Compose through `direnv`, so the values from `.envrc` are loaded automatically.
+
+For local Python tooling outside Docker, install the app and dev dependencies with `uv sync --project apps/api --group dev`.
+
+To enable the repo hooks:
+
+```bash
+make install-hooks
+```
+
+The pre-commit config runs `ruff check --fix` and `ruff format` against `apps/api`.
 
 Once the app is running:
 
@@ -170,6 +191,34 @@ make migrate
 ```
 
 The schema migrations also seed the initial `sports` and `leagues` rows for `basketball` and `nba`.
+
+The first ingestion CLI is available for syncing NBA teams from Stathead / Sports Reference.
+
+Live source sync:
+
+```bash
+make sync-nba-teams
+```
+
+Fixture-based sync for local verification:
+
+```bash
+make sync-nba-teams-fixture
+```
+
+An NBA.com source path is also available for teams.
+
+Live NBA.com sync:
+
+```bash
+make sync-nba-com-teams
+```
+
+Fixture-based NBA.com sync:
+
+```bash
+make sync-nba-com-teams-fixture
+```
 
 The first API slice currently supports listing and creating strategies.
 

@@ -1,13 +1,9 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import Query
+from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
 from quant_cover_api.api.dependencies import get_db
-from quant_cover_api.api.schemas.strategy import StrategyCreate
-from quant_cover_api.api.schemas.strategy import StrategyResponse
+from quant_cover_api.api.schemas.strategy import StrategyCreate, StrategyResponse
 from quant_cover_api.services.strategy_service import StrategyService
-
 
 router = APIRouter(prefix="/strategies", tags=["strategies"])
 
