@@ -9,6 +9,8 @@ WORKDIR /app
 COPY --from=ghcr.io/astral-sh/uv:0.6.17 /uv /uvx /bin/
 
 COPY pyproject.toml ./pyproject.toml
+COPY alembic.ini ./alembic.ini
+COPY alembic ./alembic
 COPY src ./src
 
 RUN uv pip install --system -e .

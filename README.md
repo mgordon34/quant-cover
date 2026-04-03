@@ -29,6 +29,7 @@ The initial scaffold now includes:
 - `apps/api` for the Python FastAPI service
 - `deploy/docker/docker-compose.yml` for local development
 - a minimal app entrypoint with `GET /health`
+- SQLAlchemy and Alembic setup for the first core tables
 
 ## Architectural Direction
 
@@ -142,6 +143,7 @@ make down
 make build
 make logs
 make ps
+make migrate
 ```
 
 The root `Makefile` runs Compose through `direnv`, so the values from `.envrc` are loaded automatically.
@@ -150,6 +152,7 @@ Once the app is running:
 
 - API root: `http://localhost:8000/`
 - health endpoint: `http://localhost:8000/health`
+- strategies endpoint: `http://localhost:8000/strategies`
 
 Expected health response:
 
@@ -159,6 +162,35 @@ Expected health response:
   "service": "quant-cover-api"
 }
 ```
+
+Apply the initial database migration after the containers are up:
+
+```bash
+make migrate
+```
+
+The first API slice currently supports listing and creating strategies.
+
+List strategies for a user:
+
+```bash
+curl "http://localhost:8000/strategies?user_id=1"
+```
+
+Create a strategy for a user:
+
+```bash
+curl -X POST "http://localhost:8000/strategies" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": 1,
+    "name": "Simple pace filter",
+    "description": "Initial test strategy",
+    "configuration": {"min_edge": 0.03}
+  }'
+```
+
+For now, strategies require an existing `users.id`. Auth and user-management endpoints are not implemented yet.
 
 ## Notes
 

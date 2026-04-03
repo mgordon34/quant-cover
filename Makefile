@@ -1,7 +1,7 @@
 COMPOSE_FILE := deploy/docker/docker-compose.yml
 COMPOSE := direnv exec . docker compose -f $(COMPOSE_FILE)
 
-.PHONY: up down build logs ps restart
+.PHONY: up down build logs ps restart migrate
 
 up:
 	$(COMPOSE) up --build
@@ -21,3 +21,6 @@ ps:
 restart:
 	$(COMPOSE) down
 	$(COMPOSE) up --build
+
+migrate:
+	$(COMPOSE) run --rm api alembic upgrade head
