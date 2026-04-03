@@ -9,7 +9,7 @@ services:
       APP_PORT: ${APP_PORT:-8000}
       DATABASE_URL: ${DATABASE_URL:-postgresql://quant_cover:quant_cover@postgres:5432/quant_cover}
     volumes:
-      - ../../apps/api/src:/app/src
+      - ../../apps/api:/app
     ports:
       - "8000:8000"
     depends_on:
