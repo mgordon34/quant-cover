@@ -20,7 +20,7 @@ class ParsedGame:
 def parse_nba_api_games(payload: dict[str, Any]) -> list[ParsedGame]:
     games = payload.get("scoreboard", {}).get("games", [])
     if not games:
-        raise ValueError("no games found in nba_api games payload")
+        return []
 
     parsed_games: list[ParsedGame] = []
     for game in games:
