@@ -18,6 +18,8 @@ down_revision: Union[str, None] = "20260403_0003"
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
+portable_json = sa.JSON().with_variant(postgresql.JSONB(astext_type=sa.Text()), "postgresql")
+
 
 def upgrade() -> None:
     op.create_table(
@@ -75,7 +77,7 @@ def upgrade() -> None:
         sa.Column("offensive_rating", sa.Numeric(precision=6, scale=2), nullable=True),
         sa.Column("defensive_rating", sa.Numeric(precision=6, scale=2), nullable=True),
         sa.Column("stathead_row_id", sa.String(length=64), nullable=True),
-        sa.Column("metadata", postgresql.JSONB(astext_type=sa.Text()), nullable=True),
+        sa.Column("metadata", portable_json, nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.ForeignKeyConstraint(["player_id"], ["players.id"], ondelete="CASCADE"),
