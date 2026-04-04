@@ -38,8 +38,6 @@ class TeamSyncService:
         if self.nba_com_client is None:
             raise ValueError("nba.com client is not configured")
         payload = self.nba_com_client.fetch_teams_payload(league_key=league_key, fixture_path=fixture_path)
-        for line in payload:
-            print(line)
         parsed_teams = parse_nba_com_teams(payload)
 
         return self._sync_parsed_teams(league=league, parsed_teams=parsed_teams)

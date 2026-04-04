@@ -99,19 +99,20 @@ apps/api/src/quant_cover_api/
 ### Games
 
 Primary source:
-- `nba-com`
+- `nba-api`
 
 Reason:
-- accessible scoreboard-style JSON has already proven usable in this environment
-- games are naturally represented in schedule and scoreboard feeds
+- provides dated game lookup directly through NBA stats endpoints
+- is a better fit for historical game sync than the temporary live-feed approach
 
 ### Boxscores
 
 Primary source:
-- `nba-com`
+- `nba-api`
 
 Reason:
 - once a game source is selected, using the same provider for boxscores reduces cross-source matching complexity
+- `nba_api` exposes game boxscore endpoints keyed by `GAME_ID`
 
 ## Phase 1: Game Sync
 
@@ -121,7 +122,7 @@ Persist canonical NBA games.
 
 ### New modules
 
-- `scraping/parsers/nba_com_games.py`
+- `scraping/parsers/nba_api_games.py`
 - `services/game_sync_service.py`
 
 ### CLI shape
@@ -129,14 +130,14 @@ Persist canonical NBA games.
 Suggested command:
 
 ```bash
-python -m quant_cover_api.cli sync nba-com games --league nba
+python -m quant_cover_api.cli sync nba-api games --league nba
 ```
 
 Later extensions:
 
 ```bash
-python -m quant_cover_api.cli sync nba-com games --league nba --date 2026-04-02
-python -m quant_cover_api.cli sync nba-com games --league nba --season 2025-26
+python -m quant_cover_api.cli sync nba-api games --league nba --date 2026-04-02
+python -m quant_cover_api.cli sync nba-api games --league nba --season 2025-26
 ```
 
 ### Parsed game shape
@@ -196,7 +197,7 @@ Persist players and player stat lines from game boxscores.
 
 ### New modules
 
-- `scraping/parsers/nba_com_boxscore.py`
+- `scraping/parsers/nba_api_boxscore.py`
 - `services/boxscore_sync_service.py`
 - `services/player_resolution_service.py`
 
@@ -205,8 +206,8 @@ Persist players and player stat lines from game boxscores.
 Suggested commands:
 
 ```bash
-python -m quant_cover_api.cli sync nba-com boxscore --league nba --game-id <source_game_id>
-python -m quant_cover_api.cli sync nba-com boxscores --league nba --date 2026-04-02
+python -m quant_cover_api.cli sync nba-api boxscore --league nba --game-id <source_game_id>
+python -m quant_cover_api.cli sync nba-api boxscores --league nba --date 2026-04-02
 ```
 
 The first implementation should start with a single-game command.
@@ -313,7 +314,7 @@ Responsibilities:
 
 Suggested entrypoint:
 
-- `sync_nba_com_games(league_key: str, date: str | None = None) -> SyncResult`
+- `sync_nba_api_games(league_key: str, date: str | None = None) -> SyncResult`
 
 ### `player_resolution_service.py`
 
@@ -338,14 +339,14 @@ Responsibilities:
 
 Suggested entrypoints:
 
-- `sync_nba_com_boxscore(league_key: str, source_game_id: str) -> SyncResult`
-- later `sync_nba_com_boxscores_for_date(league_key: str, date: str) -> SyncResult`
+- `sync_nba_api_boxscore(league_key: str, source_game_id: str) -> SyncResult`
+- later `sync_nba_api_boxscores_for_date(league_key: str, date: str) -> SyncResult`
 
 ## Recommended Build Order
 
 1. implement `nba_com_games` parser
 2. implement `game_sync_service`
-3. add CLI command for `sync nba-com games --league nba`
+3. add CLI command for `sync nba-api games --league nba`
 4. verify game sync against fixture or live payload
 5. implement `nba_com_boxscore` parser
 6. implement `player_resolution_service`

@@ -155,6 +155,8 @@ make sync-nba-teams
 make sync-nba-teams-fixture
 make sync-nba-com-teams
 make sync-nba-com-teams-fixture
+make sync-nba-api-games DATE=YYYY-MM-DD
+make sync-nba-api-games-fixture
 ```
 
 The root `Makefile` runs Compose through `direnv`, so the values from `.envrc` are loaded automatically.
@@ -218,6 +220,20 @@ Fixture-based NBA.com sync:
 
 ```bash
 make sync-nba-com-teams-fixture
+```
+
+Date-based NBA game sync now uses `nba_api`.
+
+Live historical/current-date game sync:
+
+```bash
+make sync-nba-api-games DATE=2026-04-02
+```
+
+Fixture-based date sync:
+
+```bash
+make sync-nba-api-games-fixture
 ```
 
 The first API slice currently supports listing and creating strategies.
