@@ -4,6 +4,7 @@ from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 from quant_cover_api.config import get_settings
+from quant_cover_api.db import models  # noqa: F401
 from quant_cover_api.db.base import Base
 
 config = context.config
