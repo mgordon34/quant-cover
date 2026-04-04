@@ -1,9 +1,7 @@
-from datetime import datetime
-from datetime import timezone
+from datetime import datetime, timezone
 
 from sqlalchemy import DateTime
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
+from sqlalchemy.orm import Mapped, mapped_column
 
 
 def utcnow() -> datetime:

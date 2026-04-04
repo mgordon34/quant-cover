@@ -1,12 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy import BigInteger
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy import BigInteger, ForeignKey, String, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from quant_cover_api.db.base import Base
 from quant_cover_api.db.models.timestamps import TimestampMixin
@@ -14,9 +9,7 @@ from quant_cover_api.db.models.timestamps import TimestampMixin
 
 class PlayerAlias(TimestampMixin, Base):
     __tablename__ = "player_aliases"
-    __table_args__ = (
-        UniqueConstraint("stathead_source", "normalized_alias", name="uq_player_aliases_source_normalized_alias"),
-    )
+    __table_args__ = (UniqueConstraint("stathead_source", "normalized_alias", name="uq_player_aliases_source_normalized_alias"),)
 
     id: Mapped[int] = mapped_column(BigInteger, primary_key=True, autoincrement=True)
     player_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("players.id", ondelete="CASCADE"), index=True)

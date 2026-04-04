@@ -1,18 +1,9 @@
 from __future__ import annotations
 
-from datetime import date
-from datetime import datetime
+from datetime import date, datetime
 
-from sqlalchemy import BigInteger
-from sqlalchemy import CheckConstraint
-from sqlalchemy import Date
-from sqlalchemy import DateTime
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy import BigInteger, CheckConstraint, Date, DateTime, ForeignKey, Integer, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from quant_cover_api.db.base import Base
 from quant_cover_api.db.models.timestamps import TimestampMixin

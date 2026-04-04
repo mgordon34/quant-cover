@@ -3,19 +3,12 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
-from sqlalchemy import BigInteger
-from sqlalchemy import ForeignKey
-from sqlalchemy import Integer
-from sqlalchemy import Numeric
-from sqlalchemy import String
-from sqlalchemy import UniqueConstraint
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy import BigInteger, ForeignKey, Integer, Numeric, String, UniqueConstraint
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from quant_cover_api.db.base import Base
 from quant_cover_api.db.models.timestamps import TimestampMixin
+from quant_cover_api.db.types import portable_json
 
 
 class PlayerGameStat(TimestampMixin, Base):
@@ -39,7 +32,7 @@ class PlayerGameStat(TimestampMixin, Base):
     offensive_rating: Mapped[Decimal | None] = mapped_column(Numeric(6, 2), nullable=True)
     defensive_rating: Mapped[Decimal | None] = mapped_column(Numeric(6, 2), nullable=True)
     stathead_row_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
-    metadata_json: Mapped[dict[str, Any] | None] = mapped_column("metadata", JSONB, nullable=True)
+    metadata_json: Mapped[dict[str, Any] | None] = mapped_column("metadata", portable_json, nullable=True)
 
     player = relationship("Player", back_populates="player_game_stats")
     game = relationship("Game", back_populates="player_game_stats")

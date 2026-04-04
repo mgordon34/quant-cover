@@ -1,19 +1,14 @@
 from __future__ import annotations
 
 from datetime import date
-from sqlalchemy import BigInteger
-from sqlalchemy import Date
 from typing import Any
 
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
-from sqlalchemy.dialects.postgresql import JSONB
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy import BigInteger, Date, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from quant_cover_api.db.base import Base
 from quant_cover_api.db.models.timestamps import TimestampMixin
+from quant_cover_api.db.types import portable_json
 
 
 class Player(TimestampMixin, Base):
@@ -26,7 +21,7 @@ class Player(TimestampMixin, Base):
     stathead_player_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     primary_position: Mapped[str | None] = mapped_column(String(32), nullable=True)
     birth_date: Mapped[date | None] = mapped_column(Date, nullable=True)
-    metadata_json: Mapped[dict[str, Any] | None] = mapped_column("metadata", JSONB, nullable=True)
+    metadata_json: Mapped[dict[str, Any] | None] = mapped_column("metadata", portable_json, nullable=True)
 
     league = relationship("League", back_populates="players")
     aliases = relationship("PlayerAlias", back_populates="player", cascade="all, delete-orphan")

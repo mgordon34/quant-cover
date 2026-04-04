@@ -1,13 +1,9 @@
-from fastapi import APIRouter
-from fastapi import Depends
-from fastapi import Path
+from fastapi import APIRouter, Depends, Path
 from sqlalchemy.orm import Session
 
 from quant_cover_api.api.dependencies import get_db
-from quant_cover_api.api.schemas.user import UserCreate
-from quant_cover_api.api.schemas.user import UserResponse
+from quant_cover_api.api.schemas.user import UserCreate, UserResponse
 from quant_cover_api.services.user_service import UserService
-
 
 router = APIRouter(prefix="/users", tags=["users"])
 

@@ -1,12 +1,7 @@
 from __future__ import annotations
 
-from sqlalchemy import BigInteger
-from sqlalchemy import Boolean
-from sqlalchemy import ForeignKey
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import relationship
+from sqlalchemy import BigInteger, Boolean, ForeignKey, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from quant_cover_api.db.base import Base
 from quant_cover_api.db.models.timestamps import TimestampMixin

@@ -1,13 +1,11 @@
 from logging.config import fileConfig
 
+from sqlalchemy import engine_from_config, pool
+
 from alembic import context
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
-
 from quant_cover_api.config import get_settings
+from quant_cover_api.db import models  # noqa: F401
 from quant_cover_api.db.base import Base
-import quant_cover_api.db.models
-
 
 config = context.config
 
