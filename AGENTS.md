@@ -54,6 +54,7 @@ Do not couple API response models tightly to database internals unless there is 
 ## Python Standards
 
 - Use type hints where they improve clarity.
+- Prefer f-strings for string formatting unless they make the code less readable.
 - Prefer small, cohesive modules.
 - Keep side effects near the edges of the application.
 - Make dependencies explicit.

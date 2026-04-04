@@ -2,7 +2,7 @@ COMPOSE_FILE := deploy/docker/docker-compose.yml
 COMPOSE := direnv exec . docker compose -f $(COMPOSE_FILE)
 API_UV := uv run --project apps/api
 
-.PHONY: up down build logs ps restart migrate test test-unit test-integration lint format check pre-commit install-hooks sync-nba-teams sync-nba-teams-fixture sync-nba-com-teams sync-nba-com-teams-fixture sync-nba-api-games sync-nba-api-games-fixture
+.PHONY: up down build logs ps restart migrate test test-unit test-integration lint format check pre-commit install-hooks sync-nba-teams sync-nba-teams-fixture sync-nba-com-teams sync-nba-com-teams-fixture sync-nba-api-games sync-nba-api-games-fixture sync-nba-api-games-range
 
 up:
 	$(COMPOSE) up --build
@@ -67,6 +67,9 @@ sync-nba-com-teams-fixture:
 
 sync-nba-api-games:
 	$(COMPOSE) run --build --rm api python -m quant_cover_api.cli sync nba-api games --league nba --date $(DATE)
+
+sync-nba-api-games-range:
+	$(COMPOSE) run --build --rm api python -m quant_cover_api.cli sync nba-api games --league nba --from-date $(FROM) --to-date $(TO)
 
 sync-nba-api-games-fixture:
 	$(COMPOSE) run --build --rm api python -m quant_cover_api.cli sync nba-api games --league nba --date 2026-04-02 --fixture /app/src/quant_cover_api/scraping/fixtures/nba_api_games_2026-04-02.json

@@ -1,4 +1,6 @@
-from datetime import date
+import logging
+import time
+from datetime import date, timedelta
 from pathlib import Path
 
 from sqlalchemy import select
@@ -11,6 +13,8 @@ from quant_cover_api.scraping.clients.nba_api_client import NbaApiClient
 from quant_cover_api.scraping.parsers.nba_api_games import ParsedGame, parse_nba_api_games
 from quant_cover_api.services.sync_result import SyncResult
 
+logger = logging.getLogger(__name__)
+
 
 class GameSyncService:
     def __init__(self, *, session: Session, nba_api_client: NbaApiClient | None = None) -> None:
@@ -18,6 +22,7 @@ class GameSyncService:
         self.nba_api_client = nba_api_client
 
     def sync_nba_api_games_for_date(self, *, league_key: str, game_date: date, fixture_path: Path | None = None) -> SyncResult:
+        logger.info(f"starting game scrape for date league={league_key} date={game_date.isoformat()}")
         league = self._get_league(league_key)
         if self.nba_api_client is None:
             raise ValueError("nba_api client is not configured")
@@ -28,7 +33,39 @@ class GameSyncService:
             fixture_path=fixture_path,
         )
         parsed_games = parse_nba_api_games(payload)
-        return self._sync_parsed_games(league=league, parsed_games=parsed_games)
+        result = self._sync_parsed_games(league=league, parsed_games=parsed_games)
+        logger.info(
+            f"finished game scrape for date league={league_key} date={game_date.isoformat()} "
+            f"games_scraped={len(parsed_games)} created={result.created} "
+            f"updated={result.updated} skipped={result.skipped}"
+        )
+        return result
+
+    def sync_nba_api_games_for_date_range(
+        self,
+        *,
+        league_key: str,
+        start_date: date,
+        end_date: date,
+        request_delay_seconds: float = 1.0,
+    ) -> SyncResult:
+        if end_date < start_date:
+            raise ValueError("end_date must be on or after start_date")
+
+        result = SyncResult()
+        current_date = start_date
+        while current_date <= end_date:
+            daily_result = self.sync_nba_api_games_for_date(league_key=league_key, game_date=current_date)
+            result.created += daily_result.created
+            result.updated += daily_result.updated
+            result.skipped += daily_result.skipped
+
+            if current_date < end_date:
+                time.sleep(request_delay_seconds)
+
+            current_date += timedelta(days=1)
+
+        return result
 
     def _sync_parsed_games(self, *, league: League, parsed_games: list[ParsedGame]) -> SyncResult:
         result = SyncResult()

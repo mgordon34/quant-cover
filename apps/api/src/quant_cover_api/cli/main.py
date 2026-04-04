@@ -1,4 +1,5 @@
 import argparse
+import logging
 from datetime import date
 from pathlib import Path
 
@@ -9,6 +10,9 @@ from quant_cover_api.scraping.clients.stathead import StatheadClient
 from quant_cover_api.services.game_sync_service import GameSyncService
 from quant_cover_api.services.sync_result import SyncResult
 from quant_cover_api.services.team_sync_service import TeamSyncService
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+logger = logging.getLogger(__name__)
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -32,17 +36,15 @@ def build_parser() -> argparse.ArgumentParser:
     nba_com_teams_parser.add_argument("--league", required=True)
     nba_com_teams_parser.add_argument("--fixture", type=Path)
 
-    nba_com_games_parser = nba_com_subparsers.add_parser("games")
-    nba_com_games_parser.add_argument("--league", required=True)
-    nba_com_games_parser.add_argument("--date", type=date.fromisoformat, required=True)
-    nba_com_games_parser.add_argument("--fixture", type=Path)
-
     nba_api_parser = sync_subparsers.add_parser("nba-api")
     nba_api_subparsers = nba_api_parser.add_subparsers(dest="resource", required=True)
 
     nba_api_games_parser = nba_api_subparsers.add_parser("games")
     nba_api_games_parser.add_argument("--league", required=True)
-    nba_api_games_parser.add_argument("--date", type=date.fromisoformat, required=True)
+    date_group = nba_api_games_parser.add_mutually_exclusive_group(required=True)
+    date_group.add_argument("--date", type=date.fromisoformat)
+    date_group.add_argument("--from-date", dest="from_date", type=date.fromisoformat)
+    nba_api_games_parser.add_argument("--to-date", dest="to_date", type=date.fromisoformat)
     nba_api_games_parser.add_argument("--fixture", type=Path)
 
     return parser
@@ -59,7 +61,13 @@ def main() -> int:
         return run_team_sync(source="nba-com", league_key=args.league, fixture_path=args.fixture)
 
     if args.command == "sync" and args.source == "nba-api" and args.resource == "games":
-        return run_game_sync(league_key=args.league, game_date=args.date, fixture_path=args.fixture)
+        return run_game_sync(
+            league_key=args.league,
+            game_date=args.date,
+            from_date=args.from_date,
+            to_date=args.to_date,
+            fixture_path=args.fixture,
+        )
 
     parser.error("unsupported command")
     return 2
@@ -91,16 +99,41 @@ def run_team_sync(*, source: str, league_key: str, fixture_path: Path | None) ->
     return 0
 
 
-def run_game_sync(*, league_key: str, game_date: date, fixture_path: Path | None) -> int:
+def run_game_sync(
+    *,
+    league_key: str,
+    game_date: date | None,
+    from_date: date | None,
+    to_date: date | None,
+    fixture_path: Path | None,
+) -> int:
     session = SessionLocal()
 
     try:
-        service = GameSyncService(session=session, nba_api_client=NbaApiClient())
-        result = service.sync_nba_api_games_for_date(
-            league_key=league_key,
-            game_date=game_date,
-            fixture_path=fixture_path,
+        logger.info(
+            f"starting game scrape session league={league_key} "
+            f"date={game_date.isoformat() if game_date is not None else None} "
+            f"from_date={from_date.isoformat() if from_date is not None else None} "
+            f"to_date={to_date.isoformat() if to_date is not None else None} "
+            f"fixture={str(fixture_path) if fixture_path is not None else None}"
         )
+        service = GameSyncService(session=session, nba_api_client=NbaApiClient())
+        if game_date is not None:
+            result = service.sync_nba_api_games_for_date(
+                league_key=league_key,
+                game_date=game_date,
+                fixture_path=fixture_path,
+            )
+        else:
+            if from_date is None or to_date is None:
+                raise ValueError("--from-date and --to-date are required together")
+            if fixture_path is not None:
+                raise ValueError("fixture mode only supports single-date game sync")
+            result = service.sync_nba_api_games_for_date_range(
+                league_key=league_key,
+                start_date=from_date,
+                end_date=to_date,
+            )
     except Exception as exc:
         session.rollback()
         print(f"sync failed: {exc}")
