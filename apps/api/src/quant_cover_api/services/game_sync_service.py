@@ -81,6 +81,7 @@ class GameSyncService:
                 )
             )
 
+            # If no game is present, add new game
             if game is None:
                 self.session.add(
                     Game(
