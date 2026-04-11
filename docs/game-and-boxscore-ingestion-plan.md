@@ -206,11 +206,10 @@ Persist players and player stat lines from game boxscores.
 Suggested commands:
 
 ```bash
-python -m quant_cover_api.cli sync nba-api boxscore --league nba --game-id <source_game_id>
-python -m quant_cover_api.cli sync nba-api boxscores --league nba --date 2026-04-02
+python -m quant_cover_api.cli sync nba-api boxscores --league nba --from-date 2026-04-02 --to-date 2026-04-07
 ```
 
-The first implementation should start with a single-game command.
+If you want to sync one day, use the same date for `--from-date` and `--to-date`.
 
 ### Parsed boxscore shape
 
@@ -340,7 +339,7 @@ Responsibilities:
 Suggested entrypoints:
 
 - `sync_nba_api_boxscore(league_key: str, source_game_id: str) -> SyncResult`
-- later `sync_nba_api_boxscores_for_date(league_key: str, date: str) -> SyncResult`
+- later `sync_nba_api_boxscores_for_date_range(league_key: str, start_date: date, end_date: date) -> SyncResult`
 
 ## Recommended Build Order
 

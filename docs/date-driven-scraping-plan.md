@@ -75,11 +75,12 @@ Behavior:
 - upsert games by source game id
 - update scores and status if the game already exists
 
-### Step 2: Sync completed game boxscores for a date
+### Step 2: Sync completed game boxscores for an inclusive date range
 
 Input:
 - league key
-- date
+- from date
+- to date
 
 Output:
 - upserted `players`
@@ -89,12 +90,15 @@ Output:
 Command shape:
 
 ```bash
-python -m quant_cover_api.cli sync nba-api boxscores --league nba --date 2026-04-02
+python -m quant_cover_api.cli sync nba-api boxscores --league nba --from-date 2026-04-02 --to-date 2026-04-07
 ```
+
+Use the same value for `--from-date` and `--to-date` to sync one day.
 
 Behavior:
 
-- query local `games` for the given date and league
+- iterate each day from `from_date` to `to_date`, inclusive
+- query local `games` for that date and league
 - filter to `status = completed`
 - fetch a boxscore for each completed game
 - parse player rows
@@ -227,8 +231,7 @@ Responsibilities:
 
 Suggested entrypoints:
 
-- `sync_nba_api_boxscore_for_game(league_key: str, source_game_id: str) -> SyncResult`
-- `sync_nba_api_boxscores_for_date(league_key: str, game_date: date) -> SyncResult`
+- `sync_nba_api_boxscores_for_date_range(league_key: str, start_date: date, end_date: date) -> SyncResult`
 
 ## Player Resolution Rules
 
@@ -292,7 +295,7 @@ Build these first:
 
 ```bash
 python -m quant_cover_api.cli sync nba-api games --league nba --date 2026-04-02
-python -m quant_cover_api.cli sync nba-api boxscores --league nba --date 2026-04-02
+python -m quant_cover_api.cli sync nba-api boxscores --league nba --from-date 2026-04-02 --to-date 2026-04-07
 ```
 
 ### Phase 2 command
@@ -325,7 +328,7 @@ This allows parser and sync verification without depending on the live source ev
 6. add `nba_com_boxscore.py` parser
 7. add `player_resolution_service.py`
 8. add `boxscore_sync_service.py`
-9. add `sync nba-api boxscores --league nba --date ...` CLI command
+9. add `sync nba-api boxscores --league nba --from-date ... --to-date ...` CLI command
 10. verify player creation and player stat upserts for completed games
 11. add the combined `day` orchestration command only after the two steps above are stable
 
