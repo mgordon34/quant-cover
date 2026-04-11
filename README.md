@@ -158,6 +158,9 @@ make sync-nba-com-teams-fixture
 make sync-nba-api-games DATE=YYYY-MM-DD
 make sync-nba-api-games-fixture
 make sync-nba-api-games-range FROM=YYYY-MM-DD TO=YYYY-MM-DD
+make sync-nba-api-boxscore GAME_ID=<source_game_id>
+make sync-nba-api-boxscores DATE=YYYY-MM-DD
+make sync-nba-api-boxscores-range FROM=YYYY-MM-DD TO=YYYY-MM-DD
 ```
 
 The root `Makefile` runs Compose through `direnv`, so the values from `.envrc` are loaded automatically.
