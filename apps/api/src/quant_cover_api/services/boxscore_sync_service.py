@@ -1,7 +1,6 @@
 import logging
 import time
 from datetime import date, timedelta
-from pathlib import Path
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -29,60 +28,6 @@ class BoxscoreSyncService:
         self.session = session
         self.nba_api_client = nba_api_client
         self.player_resolution_service = player_resolution_service or PlayerResolutionService(session=session)
-
-    def sync_nba_api_boxscore_for_game(
-        self,
-        *,
-        league_key: str,
-        source_game_id: str,
-        fixture_path: Path | None = None,
-    ) -> SyncResult:
-        logger.info(f"starting boxscore scrape for game league={league_key} source_game_id={source_game_id}")
-        league = self._get_league(league_key)
-        game = self._get_game(league_id=league.id, source_game_id=source_game_id)
-        if game.status != "completed":
-            logger.info(
-                f"skipping boxscore scrape for game league={league_key} source_game_id={source_game_id} status={game.status}"
-            )
-            return SyncResult(skipped=1)
-        if self.nba_api_client is None:
-            raise ValueError("nba_api client is not configured")
-
-        payload = self.nba_api_client.fetch_boxscore_payload(
-            league_key=league_key,
-            source_game_id=source_game_id,
-            fixture_path=fixture_path,
-        )
-        parsed_rows = parse_nba_api_boxscore(payload)
-        result = self._sync_parsed_boxscore(league=league, game=game, parsed_rows=parsed_rows)
-        self.session.commit()
-        logger.info(
-            f"finished boxscore scrape for game league={league_key} source_game_id={source_game_id} "
-            f"players_scraped={len(parsed_rows)} created={result.created} updated={result.updated} skipped={result.skipped}"
-        )
-        return result
-
-    def sync_nba_api_boxscores_for_date(self, *, league_key: str, game_date: date) -> SyncResult:
-        logger.info(f"starting boxscore scrape for date league={league_key} date={game_date.isoformat()}")
-        league = self._get_league(league_key)
-        games = list(
-            self.session.scalars(
-                select(Game)
-                .where(
-                    Game.league_id == league.id,
-                    Game.game_date == game_date,
-                    Game.status == "completed",
-                )
-                .order_by(Game.started_at, Game.id)
-            )
-        )
-
-        result = self._sync_games_with_delay(league_key=league_key, games=games)
-        logger.info(
-            f"finished boxscore scrape for date league={league_key} date={game_date.isoformat()} "
-            f"games_scraped={len(games)} created={result.created} updated={result.updated} skipped={result.skipped}"
-        )
-        return result
 
     def sync_nba_api_boxscores_for_date_range(
         self,
@@ -115,6 +60,7 @@ class BoxscoreSyncService:
             return result
 
         result = self._sync_games_with_delay(
+            league=league,
             league_key=league_key,
             games=games,
             request_delay_seconds=request_delay_seconds,
@@ -129,6 +75,7 @@ class BoxscoreSyncService:
     def _sync_games_with_delay(
         self,
         *,
+        league: League,
         league_key: str,
         games: list[Game],
         request_delay_seconds: float = 1.0,
@@ -139,10 +86,7 @@ class BoxscoreSyncService:
                 f"syncing boxscore game {index + 1}/{len(games)} "
                 f"source_game_id={game.source_game_id} date={game.game_date.isoformat()}"
             )
-            game_result = self.sync_nba_api_boxscore_for_game(
-                league_key=league_key,
-                source_game_id=game.source_game_id,
-            )
+            game_result = self._sync_game_boxscore(league=league, league_key=league_key, game=game)
             result.created += game_result.created
             result.updated += game_result.updated
             result.skipped += game_result.skipped
@@ -165,6 +109,28 @@ class BoxscoreSyncService:
                 .order_by(Game.started_at, Game.id)
             )
         )
+
+    def _sync_game_boxscore(self, *, league: League, league_key: str, game: Game) -> SyncResult:
+        if game.status != "completed":
+            logger.info(
+                f"skipping boxscore scrape for game league={league_key} source_game_id={game.source_game_id} status={game.status}"
+            )
+            return SyncResult(skipped=1)
+        if self.nba_api_client is None:
+            raise ValueError("nba_api client is not configured")
+
+        payload = self.nba_api_client.fetch_boxscore_payload(
+            league_key=league_key,
+            source_game_id=game.source_game_id,
+        )
+        parsed_rows = parse_nba_api_boxscore(payload)
+        result = self._sync_parsed_boxscore(league=league, game=game, parsed_rows=parsed_rows)
+        self.session.commit()
+        logger.info(
+            f"finished boxscore scrape for game league={league_key} source_game_id={game.source_game_id} "
+            f"players_scraped={len(parsed_rows)} created={result.created} updated={result.updated} skipped={result.skipped}"
+        )
+        return result
 
     def _sync_parsed_boxscore(self, *, league: League, game: Game, parsed_rows: list[ParsedPlayerBoxscore]) -> SyncResult:
         result = SyncResult()
@@ -261,14 +227,3 @@ class BoxscoreSyncService:
         if league is None:
             raise ValueError(f"league not found: {league_key}")
         return league
-
-    def _get_game(self, *, league_id: int, source_game_id: str) -> Game:
-        game = self.session.scalar(
-            select(Game).where(
-                Game.league_id == league_id,
-                Game.source_game_id == source_game_id,
-            )
-        )
-        if game is None:
-            raise ValueError(f"game not found for league_id={league_id} source_game_id={source_game_id}")
-        return game
