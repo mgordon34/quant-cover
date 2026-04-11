@@ -18,7 +18,7 @@ class Player(TimestampMixin, Base):
     league_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("leagues.id", ondelete="CASCADE"), index=True)
     full_name: Mapped[str] = mapped_column(String(255))
     display_name: Mapped[str] = mapped_column(String(255))
-    stathead_player_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source_player_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     primary_position: Mapped[str | None] = mapped_column(String(32), nullable=True)
     birth_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     metadata_json: Mapped[dict[str, Any] | None] = mapped_column("metadata", portable_json, nullable=True)

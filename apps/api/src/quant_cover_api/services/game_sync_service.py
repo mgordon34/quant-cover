@@ -77,7 +77,7 @@ class GameSyncService:
             game = self.session.scalar(
                 select(Game).where(
                     Game.league_id == league.id,
-                    Game.stathead_game_id == parsed_game.source_game_id,
+                    Game.source_game_id == parsed_game.source_game_id,
                 )
             )
 
@@ -95,7 +95,7 @@ class GameSyncService:
                         away_team_id=away_team.id,
                         home_score=parsed_game.home_score,
                         away_score=parsed_game.away_score,
-                        stathead_game_id=parsed_game.source_game_id,
+                        source_game_id=parsed_game.source_game_id,
                     )
                 )
                 result.created += 1

@@ -168,7 +168,7 @@ class ParsedGame:
 - fetch source payload
 - parse `ParsedGame` rows
 - resolve teams by `(league_id, abbreviation)`
-- upsert games by `(league_id, stathead_game_id)` or equivalent source game id column strategy
+- upsert games by `(league_id, source_game_id)`
 - update scores and status on re-sync
 
 ### Game status mapping
@@ -252,8 +252,8 @@ Create players when they are discovered, but avoid duplicates.
 
 For each parsed player row:
 
-1. match existing player by `(league_id, stathead_player_id)` or source-specific player id field if present
-2. match by exact alias on `(stathead_source, normalized_alias)`
+1. match existing player by `(league_id, source_player_id)` when present
+2. match by exact alias on `(source, normalized_alias)`
 3. match by exact canonical full name within the league
 4. create a new player if no match exists
 

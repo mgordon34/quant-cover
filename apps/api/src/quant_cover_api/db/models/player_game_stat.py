@@ -31,7 +31,7 @@ class PlayerGameStat(TimestampMixin, Base):
     turnovers: Mapped[int | None] = mapped_column(Integer, nullable=True)
     offensive_rating: Mapped[Decimal | None] = mapped_column(Numeric(6, 2), nullable=True)
     defensive_rating: Mapped[Decimal | None] = mapped_column(Numeric(6, 2), nullable=True)
-    stathead_row_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source_row_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
     metadata_json: Mapped[dict[str, Any] | None] = mapped_column("metadata", portable_json, nullable=True)
 
     player = relationship("Player", back_populates="player_game_stats")

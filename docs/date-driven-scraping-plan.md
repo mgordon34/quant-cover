@@ -234,8 +234,8 @@ Suggested entrypoints:
 
 For each player encountered in a boxscore:
 
-1. match by `(league_id, stathead_player_id)` or the source-specific identifier field when present
-2. match by exact alias on `(stathead_source, normalized_alias)` if alias support is available
+1. match by `(league_id, source_player_id)` when present
+2. match by exact alias on `(source, normalized_alias)` if alias support is available
 3. match by exact `full_name` within the league
 4. if no match exists, create a new player row
 
