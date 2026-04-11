@@ -242,7 +242,7 @@ Deliverables:
 - `services/player_sync_service.py`
 
 Sync behavior:
-- upsert players by `(league_id, stathead_player_id)` when available
+- upsert players by `(league_id, source_player_id)` when available
 - otherwise resolve by exact canonical name within league
 - populate `player_aliases` when alternate names are available or inferred
 
@@ -261,7 +261,7 @@ Deliverables:
 
 Sync behavior:
 - resolve home and away teams by abbreviation
-- upsert games by `(league_id, stathead_game_id)` when available
+- upsert games by `(league_id, source_game_id)` when available
 - otherwise by `(league_id, game_date, home_team_id, away_team_id)` if required
 
 Acceptance criteria:
@@ -353,8 +353,8 @@ If the source becomes difficult enough that browser automation is required later
 
 Initial player resolution order:
 
-1. match by `stathead_player_id`
-2. match by exact alias on `(stathead_source, normalized_alias)`
+1. match by `source_player_id`
+2. match by exact alias on `(source, normalized_alias)`
 3. match by exact `full_name` within league
 
 Do not implement fuzzy matching in the first phase.

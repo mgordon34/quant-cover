@@ -35,7 +35,7 @@ def upgrade() -> None:
         sa.Column("away_team_id", sa.BigInteger(), nullable=False),
         sa.Column("home_score", sa.Integer(), nullable=True),
         sa.Column("away_score", sa.Integer(), nullable=True),
-        sa.Column("stathead_game_id", sa.String(length=64), nullable=True),
+        sa.Column("source_game_id", sa.String(length=64), nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
         sa.CheckConstraint("home_team_id <> away_team_id", name="ck_games_distinct_teams"),
@@ -51,11 +51,11 @@ def upgrade() -> None:
     op.create_index("ix_games_home_team_id", "games", ["home_team_id"], unique=False)
     op.create_index("ix_games_away_team_id", "games", ["away_team_id"], unique=False)
     op.create_index(
-        "ix_games_league_id_stathead_game_id",
+        "ix_games_league_id_source_game_id",
         "games",
-        ["league_id", "stathead_game_id"],
+        ["league_id", "source_game_id"],
         unique=True,
-        postgresql_where=sa.text("stathead_game_id IS NOT NULL"),
+        postgresql_where=sa.text("source_game_id IS NOT NULL"),
     )
 
     op.create_table(
@@ -76,7 +76,7 @@ def upgrade() -> None:
         sa.Column("turnovers", sa.Integer(), nullable=True),
         sa.Column("offensive_rating", sa.Numeric(precision=6, scale=2), nullable=True),
         sa.Column("defensive_rating", sa.Numeric(precision=6, scale=2), nullable=True),
-        sa.Column("stathead_row_id", sa.String(length=64), nullable=True),
+        sa.Column("source_row_id", sa.String(length=64), nullable=True),
         sa.Column("metadata", portable_json, nullable=True),
         sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
         sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
@@ -102,7 +102,7 @@ def downgrade() -> None:
     op.drop_index("ix_player_game_stats_team_id", table_name="player_game_stats")
     op.drop_index("ix_player_game_stats_game_id", table_name="player_game_stats")
     op.drop_table("player_game_stats")
-    op.drop_index("ix_games_league_id_stathead_game_id", table_name="games")
+    op.drop_index("ix_games_league_id_source_game_id", table_name="games")
     op.drop_index("ix_games_away_team_id", table_name="games")
     op.drop_index("ix_games_home_team_id", table_name="games")
     op.drop_index("ix_games_league_id_game_date", table_name="games")

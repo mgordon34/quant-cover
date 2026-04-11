@@ -30,7 +30,7 @@ class Game(TimestampMixin, Base):
     away_team_id: Mapped[int] = mapped_column(BigInteger, ForeignKey("teams.id", ondelete="CASCADE"), index=True)
     home_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
     away_score: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    stathead_game_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
+    source_game_id: Mapped[str | None] = mapped_column(String(64), nullable=True)
 
     league = relationship("League", back_populates="games")
     home_team = relationship("Team", back_populates="home_games", foreign_keys=[home_team_id])

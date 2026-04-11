@@ -7,6 +7,7 @@ from quant_cover_api.db.session import SessionLocal
 from quant_cover_api.scraping.clients.nba_api_client import NbaApiClient
 from quant_cover_api.scraping.clients.nba_com import NbaComClient
 from quant_cover_api.scraping.clients.stathead import StatheadClient
+from quant_cover_api.services.boxscore_sync_service import BoxscoreSyncService
 from quant_cover_api.services.game_sync_service import GameSyncService
 from quant_cover_api.services.sync_result import SyncResult
 from quant_cover_api.services.team_sync_service import TeamSyncService
@@ -47,6 +48,11 @@ def build_parser() -> argparse.ArgumentParser:
     nba_api_games_parser.add_argument("--to-date", dest="to_date", type=date.fromisoformat)
     nba_api_games_parser.add_argument("--fixture", type=Path)
 
+    nba_api_boxscores_parser = nba_api_subparsers.add_parser("boxscores")
+    nba_api_boxscores_parser.add_argument("--league", required=True)
+    nba_api_boxscores_parser.add_argument("--from-date", dest="from_date", required=True, type=date.fromisoformat)
+    nba_api_boxscores_parser.add_argument("--to-date", dest="to_date", required=True, type=date.fromisoformat)
+
     return parser
 
 
@@ -67,6 +73,13 @@ def main() -> int:
             from_date=args.from_date,
             to_date=args.to_date,
             fixture_path=args.fixture,
+        )
+
+    if args.command == "sync" and args.source == "nba-api" and args.resource == "boxscores":
+        return run_boxscore_sync(
+            league_key=args.league,
+            from_date=args.from_date,
+            to_date=args.to_date,
         )
 
     parser.error("unsupported command")
@@ -147,3 +160,38 @@ def run_game_sync(
 
 def render_sync_result(result: SyncResult) -> str:
     return f"created={result.created} updated={result.updated} skipped={result.skipped}"
+
+
+def run_boxscore_sync(
+    *,
+    league_key: str,
+    from_date: date,
+    to_date: date | None,
+) -> int:
+    session = SessionLocal()
+
+    try:
+        logger.info(
+            f"starting boxscore scrape session league={league_key} "
+            f"from_date={from_date.isoformat()} "
+            f"to_date={to_date.isoformat()}"
+        )
+        service = BoxscoreSyncService(session=session, nba_api_client=NbaApiClient())
+        result = service.sync_nba_api_boxscores_for_date_range(
+            league_key=league_key,
+            start_date=from_date,
+            end_date=to_date,
+        )
+        logger.info(
+            f"finished boxscore scrape session league={league_key} created={result.created} "
+            f"updated={result.updated} skipped={result.skipped}"
+        )
+    except Exception as exc:
+        session.rollback()
+        print(f"sync failed: {exc}")
+        return 1
+    finally:
+        session.close()
+
+    print(render_sync_result(result))
+    return 0

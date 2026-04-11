@@ -29,14 +29,14 @@ Core entities should stay canonical:
 
 Source-specific identifiers should not be represented with generic column names like `index`.
 
-For the first pass, Stathead-specific identifiers can live on the canonical tables as explicit `stathead_*_id` columns.
+For the first pass, NBA API identifiers can live on the canonical tables as explicit `nba_api_*_id` columns.
 
 If a second or third source becomes important, add a separate `external_ids` table instead of overloading the canonical tables further.
 
 ### Naming
 
 - use `player_game_stats`, not `player_games`
-- use explicit `stathead_*_id` names, not `index`
+- use explicit `nba_api_*_id` names, not `index`
 - use `game_date` for the calendar date
 - also include `started_at` when tipoff time matters
 - use `metadata` only as an escape hatch, not for core fields
@@ -144,7 +144,7 @@ Columns:
 - `league_id` `bigint` not null references `leagues(id)` on delete cascade
 - `full_name` `varchar(255)` not null
 - `display_name` `varchar(255)` not null
-- `stathead_player_id` `varchar(64)` nullable
+- `source_player_id` `varchar(64)` nullable
 - `primary_position` `varchar(32)` nullable
 - `birth_date` `date` nullable
 - `metadata` `jsonb` nullable
@@ -155,7 +155,7 @@ Indexes:
 - index on `(league_id, full_name)`
 
 Constraints:
-- unique `(league_id, stathead_player_id)`
+- unique `(league_id, source_player_id)`
 
 Notes:
 - `display_name` is the preferred product/UI name
@@ -170,7 +170,7 @@ Purpose:
 Columns:
 - `id` `bigint` primary key
 - `player_id` `bigint` not null references `players(id)` on delete cascade
-- `stathead_source` `varchar(64)` not null
+- `source` `varchar(64)` not null
 - `alias` `varchar(255)` not null
 - `normalized_alias` `varchar(255)` not null
 - `created_at` `timestamptz` not null
@@ -181,7 +181,7 @@ Indexes:
 - index on `normalized_alias`
 
 Constraints:
-- unique `(stathead_source, normalized_alias)`
+- unique `(source, normalized_alias)`
 
 Notes:
 - `normalized_alias` should be a deterministic normalized form used for matching
@@ -204,7 +204,7 @@ Columns:
 - `away_team_id` `bigint` not null references `teams(id)` on delete cascade
 - `home_score` `integer` nullable
 - `away_score` `integer` nullable
-- `stathead_game_id` `varchar(64)` nullable
+- `source_game_id` `varchar(64)` nullable
 - `created_at` `timestamptz` not null
 - `updated_at` `timestamptz` not null
 
@@ -221,7 +221,7 @@ Indexes:
 - index on `away_team_id`
 
 Constraints:
-- unique `(league_id, stathead_game_id)`
+- unique `(league_id, source_game_id)`
 - check `home_team_id <> away_team_id`
 - check `status in ('scheduled', 'in_progress', 'completed', 'postponed', 'cancelled')`
 
@@ -251,7 +251,7 @@ Columns:
 - `turnovers` `integer` nullable
 - `offensive_rating` `numeric(6,2)` nullable
 - `defensive_rating` `numeric(6,2)` nullable
-- `stathead_row_id` `varchar(64)` nullable
+- `source_row_id` `varchar(64)` nullable
 - `metadata` `jsonb` nullable
 - `created_at` `timestamptz` not null
 - `updated_at` `timestamptz` not null
@@ -345,12 +345,12 @@ Why separate from players:
 
 ## Ingestion Implications
 
-### First source: Stathead / Sports Reference
+### First source: NBA API
 
 Expected mapping:
 - teams -> `abbreviation`
-- players -> `stathead_player_id`
-- games -> `stathead_game_id`
+- players -> `source_player_id`
+- games -> `source_game_id`
 
 Expected first sync order:
 1. sync teams
@@ -361,8 +361,8 @@ Expected first sync order:
 ### Name matching
 
 For players, matching should use this order:
-1. exact Stathead id match
-2. exact alias match on `(stathead_source, normalized_alias)`
+1. exact NBA API id match
+2. exact alias match on `(source, normalized_alias)`
 3. exact canonical name match within league
 4. unresolved record handling later
 
@@ -382,11 +382,11 @@ Reason:
 
 If you expect cross-league identity soon, this should be revisited before migration.
 
-### 2. `stathead_*_id` vs `external_ids`
+### 2. `nba_api_*_id` vs `external_ids`
 
 Current spec choice:
-- explicit `stathead_player_id` and `stathead_game_id`
-- use `teams.abbreviation` as the Stathead team code in the first implementation
+- explicit `source_player_id` and `source_game_id`
+- use `teams.abbreviation` as the NBA team code in the first implementation
 
 Reason:
 - simpler for the first implementation
@@ -417,4 +417,4 @@ This spec now includes a status check constraint for `games.status`.
 
 1. Do you want `started` in `player_game_stats` in the first migration, or would you prefer to keep only the box-score stat columns initially?
 2. Do you want `teams.abbreviation` to remain the canonical team code permanently, or should we reserve a more generic `code` column name before implementation?
-3. Do you want `player_aliases.stathead_source` to stay explicit, or should it be generalized only when a second source actually appears?
+3. Do you want `player_aliases.source` to stay generic, or should it become source-specific only when alias behavior requires it?

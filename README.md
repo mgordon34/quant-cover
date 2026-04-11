@@ -158,7 +158,10 @@ make sync-nba-com-teams-fixture
 make sync-nba-api-games DATE=YYYY-MM-DD
 make sync-nba-api-games-fixture
 make sync-nba-api-games-range FROM=YYYY-MM-DD TO=YYYY-MM-DD
+make sync-nba-api-boxscores-range FROM=YYYY-MM-DD TO=YYYY-MM-DD
 ```
+
+For a single day, use the same date for both `FROM` and `TO`.
 
 The root `Makefile` runs Compose through `direnv`, so the values from `.envrc` are loaded automatically.
 

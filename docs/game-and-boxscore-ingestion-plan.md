@@ -168,7 +168,7 @@ class ParsedGame:
 - fetch source payload
 - parse `ParsedGame` rows
 - resolve teams by `(league_id, abbreviation)`
-- upsert games by `(league_id, stathead_game_id)` or equivalent source game id column strategy
+- upsert games by `(league_id, source_game_id)`
 - update scores and status on re-sync
 
 ### Game status mapping
@@ -206,11 +206,10 @@ Persist players and player stat lines from game boxscores.
 Suggested commands:
 
 ```bash
-python -m quant_cover_api.cli sync nba-api boxscore --league nba --game-id <source_game_id>
-python -m quant_cover_api.cli sync nba-api boxscores --league nba --date 2026-04-02
+python -m quant_cover_api.cli sync nba-api boxscores --league nba --from-date 2026-04-02 --to-date 2026-04-07
 ```
 
-The first implementation should start with a single-game command.
+If you want to sync one day, use the same date for `--from-date` and `--to-date`.
 
 ### Parsed boxscore shape
 
@@ -252,8 +251,8 @@ Create players when they are discovered, but avoid duplicates.
 
 For each parsed player row:
 
-1. match existing player by `(league_id, stathead_player_id)` or source-specific player id field if present
-2. match by exact alias on `(stathead_source, normalized_alias)`
+1. match existing player by `(league_id, source_player_id)` when present
+2. match by exact alias on `(source, normalized_alias)`
 3. match by exact canonical full name within the league
 4. create a new player if no match exists
 
@@ -340,7 +339,7 @@ Responsibilities:
 Suggested entrypoints:
 
 - `sync_nba_api_boxscore(league_key: str, source_game_id: str) -> SyncResult`
-- later `sync_nba_api_boxscores_for_date(league_key: str, date: str) -> SyncResult`
+- later `sync_nba_api_boxscores_for_date_range(league_key: str, start_date: date, end_date: date) -> SyncResult`
 
 ## Recommended Build Order
 
