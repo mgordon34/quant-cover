@@ -61,12 +61,20 @@ Do not couple API response models tightly to database internals unless there is 
 - Raise clear errors.
 - Avoid hidden global state.
 
+## Logging
+
+- Add sensible logging by default for new features, especially long-running or multi-step flows.
+- Log the start and finish of orchestration paths with key identifiers and summary counts.
+- Include enough detail to trace progress in CLI-driven ingestion without attaching a debugger.
+- Prefer concise structured message patterns over noisy per-line narration.
+
 ## Editing Guidance
 
 - Make the smallest correct change.
 - Read surrounding code before editing.
 - Preserve consistency with existing naming and structure unless refactoring is part of the task.
 - When touching confusing code, favor simplifying it rather than layering onto it.
+- Do not consider implementation tasks complete until relevant linting checks and unit tests have been run and passed.
 
 ## Early-Stage Repository Guidance
 
