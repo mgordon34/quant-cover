@@ -6,7 +6,7 @@ from nba_api.stats.endpoints import BoxScoreAdvancedV3, BoxScoreTraditionalV3, s
 
 
 class NbaApiClient:
-    def fetch_games_payload(self, *, league_key: str, game_date: date, fixture_path: Path | None = None) -> dict:
+    def fetch_games_payload(self, league_key: str, game_date: date, fixture_path: Path | None = None) -> dict:
         if fixture_path is not None:
             return json.loads(fixture_path.read_text(encoding="utf-8"))
 
@@ -15,7 +15,7 @@ class NbaApiClient:
 
         return scoreboardv3.ScoreboardV3(game_date=game_date.strftime("%m/%d/%Y"), league_id="00").get_dict()
 
-    def fetch_boxscore_payload(self, *, league_key: str, source_game_id: str, fixture_path: Path | None = None) -> dict:
+    def fetch_boxscore_payload(self, league_key: str, source_game_id: str, fixture_path: Path | None = None) -> dict:
         if fixture_path is not None:
             return json.loads(fixture_path.read_text(encoding="utf-8"))
 

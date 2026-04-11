@@ -10,7 +10,7 @@ class UserService:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def create_user(self, *, email: str, display_name: str | None) -> User:
+    def create_user(self, email: str, display_name: str | None) -> User:
         normalized_email = email.strip().lower()
         existing_user = self.session.scalar(select(User).where(User.email == normalized_email))
         if existing_user is not None:
@@ -26,7 +26,7 @@ class UserService:
         self.session.refresh(user)
         return user
 
-    def get_user(self, *, user_id: int) -> User:
+    def get_user(self, user_id: int) -> User:
         user = self.session.get(User, user_id)
         if user is None:
             raise HTTPException(status_code=404, detail="User not found")

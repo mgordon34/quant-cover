@@ -20,7 +20,6 @@ logger = logging.getLogger(__name__)
 class BoxscoreSyncService:
     def __init__(
         self,
-        *,
         session: Session,
         nba_api_client: NbaApiClient | None = None,
         player_resolution_service: PlayerResolutionService | None = None,
@@ -31,7 +30,6 @@ class BoxscoreSyncService:
 
     def sync_nba_api_boxscores_for_date_range(
         self,
-        *,
         league_key: str,
         start_date: date,
         end_date: date,
@@ -74,7 +72,6 @@ class BoxscoreSyncService:
 
     def _sync_games_with_delay(
         self,
-        *,
         league: League,
         league_key: str,
         games: list[Game],
@@ -97,7 +94,7 @@ class BoxscoreSyncService:
 
         return result
 
-    def _get_completed_games_for_date(self, *, league_id: int, game_date: date) -> list[Game]:
+    def _get_completed_games_for_date(self, league_id: int, game_date: date) -> list[Game]:
         return list(
             self.session.scalars(
                 select(Game)
@@ -110,7 +107,7 @@ class BoxscoreSyncService:
             )
         )
 
-    def _sync_game_boxscore(self, *, league: League, league_key: str, game: Game) -> SyncResult:
+    def _sync_game_boxscore(self, league: League, league_key: str, game: Game) -> SyncResult:
         if game.status != "completed":
             logger.info(
                 f"skipping boxscore scrape for game league={league_key} source_game_id={game.source_game_id} status={game.status}"
@@ -132,7 +129,7 @@ class BoxscoreSyncService:
         )
         return result
 
-    def _sync_parsed_boxscore(self, *, league: League, game: Game, parsed_rows: list[ParsedPlayerBoxscore]) -> SyncResult:
+    def _sync_parsed_boxscore(self, league: League, game: Game, parsed_rows: list[ParsedPlayerBoxscore]) -> SyncResult:
         result = SyncResult()
         teams_by_code = self._get_game_teams_by_code(game=game)
 
@@ -210,7 +207,7 @@ class BoxscoreSyncService:
 
         return result
 
-    def _get_game_teams_by_code(self, *, game: Game) -> dict[str, Team]:
+    def _get_game_teams_by_code(self, game: Game) -> dict[str, Team]:
         teams = list(
             self.session.scalars(
                 select(Team).where(

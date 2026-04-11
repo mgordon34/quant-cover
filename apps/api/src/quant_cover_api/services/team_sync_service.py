@@ -24,7 +24,7 @@ class TeamSyncService:
         self.stathead_client = stathead_client
         self.nba_com_client = nba_com_client
 
-    def sync_stathead_teams(self, *, league_key: str, fixture_path: Path | None = None) -> SyncResult:
+    def sync_stathead_teams(self, league_key: str, fixture_path: Path | None = None) -> SyncResult:
         league = self._get_league(league_key)
         if self.stathead_client is None:
             raise ValueError("stathead client is not configured")
@@ -33,7 +33,7 @@ class TeamSyncService:
 
         return self._sync_parsed_teams(league=league, parsed_teams=parsed_teams)
 
-    def sync_nba_com_teams(self, *, league_key: str, fixture_path: Path | None = None) -> SyncResult:
+    def sync_nba_com_teams(self, league_key: str, fixture_path: Path | None = None) -> SyncResult:
         league = self._get_league(league_key)
         if self.nba_com_client is None:
             raise ValueError("nba.com client is not configured")
@@ -42,7 +42,7 @@ class TeamSyncService:
 
         return self._sync_parsed_teams(league=league, parsed_teams=parsed_teams)
 
-    def _sync_parsed_teams(self, *, league: League, parsed_teams: list[ParsedTeam]) -> SyncResult:
+    def _sync_parsed_teams(self, league: League, parsed_teams: list[ParsedTeam]) -> SyncResult:
 
         result = SyncResult()
         for parsed_team in parsed_teams:

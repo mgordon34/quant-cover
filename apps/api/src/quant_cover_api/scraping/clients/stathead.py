@@ -18,7 +18,7 @@ class StatheadClient:
             ),
         }
 
-    def fetch_teams_html(self, *, league_key: str, fixture_path: Path | None = None) -> str:
+    def fetch_teams_html(self, league_key: str, fixture_path: Path | None = None) -> str:
         if fixture_path is not None:
             return fixture_path.read_text(encoding="utf-8")
 

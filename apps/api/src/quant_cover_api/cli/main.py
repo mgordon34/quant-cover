@@ -86,7 +86,7 @@ def main() -> int:
     return 2
 
 
-def run_team_sync(*, source: str, league_key: str, fixture_path: Path | None) -> int:
+def run_team_sync(source: str, league_key: str, fixture_path: Path | None) -> int:
     session = SessionLocal()
 
     try:
@@ -113,7 +113,6 @@ def run_team_sync(*, source: str, league_key: str, fixture_path: Path | None) ->
 
 
 def run_game_sync(
-    *,
     league_key: str,
     game_date: date | None,
     from_date: date | None,
@@ -163,7 +162,6 @@ def render_sync_result(result: SyncResult) -> str:
 
 
 def run_boxscore_sync(
-    *,
     league_key: str,
     from_date: date,
     to_date: date | None,

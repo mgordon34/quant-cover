@@ -60,6 +60,8 @@ Do not couple API response models tightly to database internals unless there is 
 - Make dependencies explicit.
 - Raise clear errors.
 - Avoid hidden global state.
+- Avoid keyword-only argument markers (`*`) unless there is a concrete public API safety or ambiguity reason.
+- Prefer simpler function signatures for internal helpers and services.
 
 ## Logging
 

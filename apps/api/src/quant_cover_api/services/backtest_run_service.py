@@ -13,7 +13,7 @@ class BacktestRunService:
     def __init__(self, session: Session) -> None:
         self.session = session
 
-    def list_backtest_runs(self, *, user_id: int) -> list[BacktestRun]:
+    def list_backtest_runs(self, user_id: int) -> list[BacktestRun]:
         self._get_user(user_id)
         statement = select(BacktestRun).where(BacktestRun.user_id == user_id).order_by(BacktestRun.created_at.desc())
         return list(self.session.scalars(statement))
@@ -44,7 +44,7 @@ class BacktestRunService:
         self.session.refresh(run)
         return run
 
-    def get_backtest_run(self, *, run_id: int) -> BacktestRun:
+    def get_backtest_run(self, run_id: int) -> BacktestRun:
         run = self.session.get(BacktestRun, run_id)
         if run is None:
             raise HTTPException(status_code=404, detail="Backtest run not found")

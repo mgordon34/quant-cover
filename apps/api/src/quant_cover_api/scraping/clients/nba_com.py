@@ -20,7 +20,7 @@ class NbaComClient:
             "Accept": "application/json",
         }
 
-    def fetch_teams_payload(self, *, league_key: str, fixture_path: Path | None = None) -> dict:
+    def fetch_teams_payload(self, league_key: str, fixture_path: Path | None = None) -> dict:
         if fixture_path is not None:
             return json.loads(fixture_path.read_text(encoding="utf-8"))
 

@@ -17,11 +17,11 @@ logger = logging.getLogger(__name__)
 
 
 class GameSyncService:
-    def __init__(self, *, session: Session, nba_api_client: NbaApiClient | None = None) -> None:
+    def __init__(self, session: Session, nba_api_client: NbaApiClient | None = None) -> None:
         self.session = session
         self.nba_api_client = nba_api_client
 
-    def sync_nba_api_games_for_date(self, *, league_key: str, game_date: date, fixture_path: Path | None = None) -> SyncResult:
+    def sync_nba_api_games_for_date(self, league_key: str, game_date: date, fixture_path: Path | None = None) -> SyncResult:
         logger.info(f"starting game scrape for date league={league_key} date={game_date.isoformat()}")
         league = self._get_league(league_key)
         if self.nba_api_client is None:
@@ -67,7 +67,7 @@ class GameSyncService:
 
         return result
 
-    def _sync_parsed_games(self, *, league: League, parsed_games: list[ParsedGame]) -> SyncResult:
+    def _sync_parsed_games(self, league: League, parsed_games: list[ParsedGame]) -> SyncResult:
         result = SyncResult()
 
         for parsed_game in parsed_games:
@@ -131,7 +131,7 @@ class GameSyncService:
             raise ValueError(f"league not found: {league_key}")
         return league
 
-    def _get_team(self, *, league_id: int, abbreviation: str) -> Team:
+    def _get_team(self, league_id: int, abbreviation: str) -> Team:
         team = self.session.scalar(select(Team).where(Team.league_id == league_id, Team.abbreviation == abbreviation))
         if team is None:
             raise ValueError(f"team not found for league_id={league_id} abbreviation={abbreviation}")

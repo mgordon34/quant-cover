@@ -12,10 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 class PlayerResolutionService:
-    def __init__(self, *, session: Session) -> None:
+    def __init__(self, session: Session) -> None:
         self.session = session
 
-    def resolve_or_create_player(self, *, league_id: int, parsed_player: ParsedPlayerBoxscore) -> Player:
+    def resolve_or_create_player(self, league_id: int, parsed_player: ParsedPlayerBoxscore) -> Player:
         if parsed_player.source_player_id is not None:
             player = self.session.scalar(
                 select(Player).where(
@@ -69,7 +69,7 @@ class PlayerResolutionService:
         )
         return player
 
-    def _update_player(self, *, player: Player, parsed_player: ParsedPlayerBoxscore) -> None:
+    def _update_player(self, player: Player, parsed_player: ParsedPlayerBoxscore) -> None:
         if player.source_player_id is None and parsed_player.source_player_id is not None:
             player.source_player_id = parsed_player.source_player_id
         if parsed_player.display_name and player.display_name != parsed_player.display_name:
@@ -77,7 +77,7 @@ class PlayerResolutionService:
         if player.primary_position is None and parsed_player.primary_position is not None:
             player.primary_position = parsed_player.primary_position
 
-    def _ensure_player_source_id_matches(self, *, player: Player, parsed_player: ParsedPlayerBoxscore) -> None:
+    def _ensure_player_source_id_matches(self, player: Player, parsed_player: ParsedPlayerBoxscore) -> None:
         if parsed_player.source_player_id is None or player.source_player_id in (None, parsed_player.source_player_id):
             return
         raise ValueError(
